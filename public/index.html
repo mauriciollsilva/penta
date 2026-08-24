@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PENTA — descubra a palavra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="bg-glow"></div>
+<canvas id="confetti"></canvas>
+<div id="toast" class="toast"></div>
+
+<div id="app">
+
+  <!-- ===================== HOME ===================== -->
+  <section id="home" class="screen active">
+    <div class="topbar-home">
+      <button class="icon-btn" id="howtoBtn" aria-label="Como jogar" title="Como jogar">?</button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Configurações" title="Configurações">⚙</button>
+    </div>
+
+    <div class="brand">
+      <div class="logo-tiles"><span>P</span><span>E</span><span>N</span><span>T</span><span>A</span></div>
+      <div class="tagline">descubra a palavra de 5 letras</div>
+    </div>
+
+    <div class="home-actions">
+      <button id="playBtn" class="btn btn-primary">Jogar o desafio de hoje</button>
+      <div id="dailyLocked" class="daily-locked" hidden></div>
+      <button id="levelPill" class="level-pill" aria-label="Trocar nível"></button>
+      <button id="freeBtn" class="btn btn-text">Jogar no modo livre →</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div id="stStreak" class="n">0</div><div class="l">Sequência</div></div>
+      <div class="stat"><div id="stWins" class="n">0</div><div class="l">Vitórias</div></div>
+      <div class="stat"><div id="stPts" class="n">0</div><div class="l">Pontos</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== COMO JOGAR ===================== -->
+  <section id="howto" class="screen">
+    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title">Como jogar</div><div class="topbar-spacer"></div></div>
+    <div class="sheet">
+      <p class="lead">Descubra a <b>palavra secreta de 5 letras</b>. A cada tentativa, as cores mostram o quão perto você está.</p>
+
+      <div class="example">
+        <div class="ex-row">
+          <span class="ex-tile correct">T</span>
+          <span class="ex-tile absent">E</span>
+          <span class="ex-tile present">R</span>
+          <span class="ex-tile absent">M</span>
+          <span class="ex-tile absent">O</span>
+        </div>
+      </div>
+
+      <ul class="legend">
+        <li><span class="dot correct"></span> <b>Verde:</b> letra certa, no lugar certo.</li>
+        <li><span class="dot present"></span> <b>Amarelo:</b> a letra existe, mas em outro lugar.</li>
+        <li><span class="dot absent"></span> <b>Cinza:</b> a letra não está na palavra.</li>
+      </ul>
+
+      <h3 class="sub">Dois jeitos de jogar</h3>
+      <p class="para"><b>Diário:</b> uma palavra por dia, igual para todo mundo. Vale para a sua sequência.</p>
+      <p class="para"><b>Livre:</b> jogue quantas vezes quiser, com palavras aleatórias. Ótimo pra treinar.</p>
+
+      <h3 class="sub">Níveis</h3>
+      <p class="para">De <b>Fácil</b> (com dicas e folga) até <b>Lendário</b> (sem cores no teclado, menos tentativas e tempo por palpite). Escolha em <b>Configurações</b>.</p>
+
+      <h3 class="sub">Dicas</h3>
+      <p class="para">Se ativar nas configurações, um botão de <b>dica</b> aparece nos níveis mais fáceis para revelar uma letra quando você travar.</p>
+
+      <button class="btn btn-primary" data-back>Entendi!</button>
+    </div>
+  </section>
+
+  <!-- ===================== CONFIGURAÇÕES ===================== -->
+  <section id="settings" class="screen">
+    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title">Configurações</div><div class="topbar-spacer"></div></div>
+    <div class="sheet">
+      <label class="field-label" for="nameInput">Seu nome (opcional)</label>
+      <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="Como quer ser chamado?" autocomplete="off">
+
+      <div class="field-label" style="margin-top:20px">Nível de dificuldade</div>
+      <div id="levelCards" class="level-cards"></div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-title">Ativar dicas</div>
+          <div class="toggle-desc">Mostra um botão de dica nos níveis que permitem (Fácil e Normal).</div>
+        </div>
+        <button id="hintsToggle" class="switch" role="switch" aria-checked="false"><span class="knob"></span></button>
+      </div>
+
+      <div class="field-label" style="margin-top:20px">Tema</div>
+      <div id="themeGrid" class="theme-grid"></div>
+      <div id="customTheme" class="custom-theme" hidden>
+        <div class="ct-row"><span>Base</span>
+          <div class="seg" id="baseSeg">
+            <button class="seg-btn" data-base="dark">Escuro</button>
+            <button class="seg-btn" data-base="light">Claro</button>
+          </div>
+        </div>
+        <div class="ct-row"><span>Cor de destaque</span>
+          <input id="customColor" type="color" value="#a78bfa" aria-label="Cor de destaque">
+        </div>
+        <div id="accentChips" class="accent-chips"></div>
+      </div>
+
+      <button class="btn btn-primary" data-back>Salvar e voltar</button>
+    </div>
+  </section>
+
+  <!-- ===================== JOGO ===================== -->
+  <section id="game" class="screen">
+    <div class="topbar">
+      <button class="back-btn" id="gameBack" aria-label="Voltar">←</button>
+      <div class="topbar-title" id="gameTitle">Diário</div>
+      <div class="topbar-right" id="gameRight"></div>
+    </div>
+    <div class="board-wrap"><div id="board" class="board"></div></div>
+    <div id="hintBar" class="hint-bar" hidden>
+      <button id="hintBtn" class="btn btn-hint">💡 Dica</button>
+      <span id="hintText" class="hint-text"></span>
+    </div>
+    <div id="keyboard" class="keyboard"></div>
+  </section>
+</div>
+
+<!-- ===================== RESULTADO ===================== -->
+<div id="overlay" class="overlay">
+  <div class="result">
+    <div id="rEmoji" class="emoji">🎉</div>
+    <h2 id="rTitle">Parabéns!</h2>
+    <div id="rSub" class="sub"></div>
+    <div id="rWord" class="word-reveal"></div>
+    <div class="result-stats">
+      <div class="stat"><div id="rTries" class="n">-</div><div class="l">Tentativas</div></div>
+      <div class="stat"><div id="rPts" class="n">0</div><div class="l">Pontos</div></div>
+      <div class="stat"><div id="rStreak" class="n">0</div><div class="l">Sequência</div></div>
+    </div>
+    <div id="rCountdown" class="countdown" hidden>
+      <div class="cd-label">Próxima palavra em</div>
+      <div id="cdClock" class="cd-clock">00:00:00</div>
+    </div>
+    <div class="result-actions">
+      <button id="againBtn" class="btn btn-primary">Jogar de novo</button>
+      <button id="rHomeBtn" class="btn btn-ghost">Início</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js" defer></script>
+</body>
+</html>
