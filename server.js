@@ -4,19 +4,19 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import {
   score, seal, open, strip, isDiff, publicConfig,
-  dailyWord, randomWord, makeHint, DIFFS,
+  dailyWord, randomWord, makeHint, DIFFS, isWord, isLang,
 } from './lib/game.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(__dirname, 'public');
 const PORT = process.env.PORT || 3000;
+const VALIDAR_PALPITE = true;   // aceita só palavras reais (VALIDAS); false = qualquer 5 letras
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
 
 /* ---------- helpers ---------- */
 const send = (res, code, obj) => {
-  const body = JSON.stringify(obj);
   res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-  res.end(body);
+  res.end(JSON.stringify(obj));
 };
 function readBody(req) {
   return new Promise((resolve) => {
@@ -32,7 +32,7 @@ async function serveStatic(req, res) {
   let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (rel === '/') rel = '/index.html';
   const full = path.join(PUBLIC, path.normalize(rel));
-  if (!full.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); } // anti path-traversal
+  if (!full.startsWith(PUBLIC)) { res.writeHead(403); return res.end('Forbidden'); }
   try {
     const buf = await readFile(full);
     res.writeHead(200, { 'Content-Type': TYPES[path.extname(full)] || 'application/octet-stream' });
@@ -47,31 +47,34 @@ async function serveStatic(req, res) {
 async function api(req, res) {
   const url = new URL(req.url, 'http://x').pathname;
 
-  // Inicia o desafio DIÁRIO (palavra do dia, igual pra todos) num nível
+  // Desafio DIÁRIO (palavra do dia por dificuldade + idioma)
   if (url === '/api/daily' && req.method === 'POST') {
-    const { difficulty } = await readBody(req);
+    const { difficulty, lang } = await readBody(req);
     const d = isDiff(difficulty) ? difficulty : 'normal';
-    const w = dailyWord(today(), d);
-    return send(res, 200, { token: seal({ w, n: 0, d, mode: 'diario', date: today(), hints: 0 }), config: publicConfig(d), date: today() });
+    const l = isLang(lang) ? lang : 'pt';
+    const w = dailyWord(today(), d, l);
+    return send(res, 200, { token: seal({ w, n: 0, d, mode: 'diario', date: today(), hints: 0, lang: l }), config: publicConfig(d), date: today(), lang: l });
   }
 
-  // Inicia jogo do modo LIVRE (palavra aleatória, quantas quiser)
+  // Modo LIVRE (palavra aleatória)
   if (url === '/api/new' && req.method === 'POST') {
-    const { difficulty } = await readBody(req);
+    const { difficulty, lang } = await readBody(req);
     const d = isDiff(difficulty) ? difficulty : 'normal';
-    const w = randomWord();
-    return send(res, 200, { token: seal({ w, n: 0, d, mode: 'livre', hints: 0 }), config: publicConfig(d) });
+    const l = isLang(lang) ? lang : 'pt';
+    const w = randomWord(l);
+    return send(res, 200, { token: seal({ w, n: 0, d, mode: 'livre', hints: 0, lang: l }), config: publicConfig(d), lang: l });
   }
 
   // Confere um palpite
   if (url === '/api/guess' && req.method === 'POST') {
     const { token, guess } = await readBody(req);
-    if (!token) return send(res, 400, { error: 'Sessão ausente' });
+    if (!token) return send(res, 400, { error: 'Sessão ausente', code: 'notoken' });
     const g = strip(guess);
-    if (!/^[A-Z]{5}$/.test(g)) return send(res, 400, { error: 'Palpite inválido' });
-    let st; try { st = open(token); } catch { return send(res, 400, { error: 'Sessão inválida' }); }
+    if (!/^[A-Z]{5}$/.test(g)) return send(res, 400, { error: 'Palpite inválido', code: 'badguess' });
+    let st; try { st = open(token); } catch { return send(res, 400, { error: 'Sessão inválida', code: 'badtoken' }); }
+    if (VALIDAR_PALPITE && !isWord(g, st.lang)) return send(res, 400, { error: 'Palavra não está na lista', code: 'notword' });
     const max = DIFFS[st.d].tentativas;
-    if (st.n >= max) return send(res, 400, { error: 'Jogo já encerrado' });
+    if (st.n >= max) return send(res, 400, { error: 'Jogo já encerrado', code: 'gameover' });
 
     const result = score(g, st.w);
     const n = st.n + 1;
@@ -83,14 +86,14 @@ async function api(req, res) {
     return send(res, 200, payload);
   }
 
-  // Pede uma dica (só se o nível permitir)
+  // Dica (se o nível permitir)
   if (url === '/api/hint' && req.method === 'POST') {
     const { token, type } = await readBody(req);
-    if (!token) return send(res, 400, { error: 'Sessão ausente' });
-    let st; try { st = open(token); } catch { return send(res, 400, { error: 'Sessão inválida' }); }
+    if (!token) return send(res, 400, { error: 'Sessão ausente', code: 'notoken' });
+    let st; try { st = open(token); } catch { return send(res, 400, { error: 'Sessão inválida', code: 'badtoken' }); }
     const max = DIFFS[st.d].dicasMax;
-    if (max <= 0) return send(res, 403, { error: 'Dicas não disponíveis neste nível' });
-    if ((st.hints || 0) >= max) return send(res, 403, { error: 'Você já usou todas as dicas' });
+    if (max <= 0) return send(res, 403, { error: 'Dicas não disponíveis neste nível', code: 'nohints' });
+    if ((st.hints || 0) >= max) return send(res, 403, { error: 'Você já usou todas as dicas', code: 'hintsmax' });
     const hint = makeHint(st.w, type);
     const hints = (st.hints || 0) + 1;
     return send(res, 200, { hint, hintsUsados: hints, dicasMax: max, token: seal({ ...st, hints }) });
@@ -99,7 +102,6 @@ async function api(req, res) {
   return send(res, 404, { error: 'Rota não encontrada' });
 }
 
-/* ---------- servidor ---------- */
 http.createServer((req, res) => {
   if (req.url.startsWith('/api/')) return api(req, res).catch(e => send(res, 500, { error: e.message }));
   return serveStatic(req, res);

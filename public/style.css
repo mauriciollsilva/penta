@@ -204,3 +204,7 @@ body{font-family:var(--body);color:var(--text);background:var(--bg-3);overflow:h
 .chip{width:27px;height:27px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;padding:0}
 .chip:hover{transform:scale(1.12)}
 .chip.on{border-color:var(--text)}
+
+/* ---- seletor de idioma (largura total) ---- */
+.seg-wide{width:100%;margin-top:8px}
+.seg-wide .seg-btn{flex:1}

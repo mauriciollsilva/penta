@@ -25,28 +25,28 @@
 
     <div class="brand">
       <div class="logo-tiles"><span>P</span><span>E</span><span>N</span><span>T</span><span>A</span></div>
-      <div class="tagline">descubra a palavra de 5 letras</div>
+      <div class="tagline" data-i18n="tagline">descubra a palavra de 5 letras</div>
     </div>
 
     <div class="home-actions">
-      <button id="playBtn" class="btn btn-primary">Jogar o desafio de hoje</button>
+      <button id="playBtn" class="btn btn-primary" data-i18n="play">Jogar o desafio de hoje</button>
       <div id="dailyLocked" class="daily-locked" hidden></div>
       <button id="levelPill" class="level-pill" aria-label="Trocar nível"></button>
-      <button id="freeBtn" class="btn btn-text">Jogar no modo livre →</button>
+      <button id="freeBtn" class="btn btn-text" data-i18n="free">Jogar no modo livre →</button>
     </div>
 
     <div class="stats-row">
-      <div class="stat"><div id="stStreak" class="n">0</div><div class="l">Sequência</div></div>
-      <div class="stat"><div id="stWins" class="n">0</div><div class="l">Vitórias</div></div>
-      <div class="stat"><div id="stPts" class="n">0</div><div class="l">Pontos</div></div>
+      <div class="stat"><div id="stStreak" class="n">0</div><div class="l" data-i18n="lbl_streak">Sequência</div></div>
+      <div class="stat"><div id="stWins" class="n">0</div><div class="l" data-i18n="lbl_wins">Vitórias</div></div>
+      <div class="stat"><div id="stPts" class="n">0</div><div class="l" data-i18n="lbl_points">Pontos</div></div>
     </div>
   </section>
 
   <!-- ===================== COMO JOGAR ===================== -->
   <section id="howto" class="screen">
-    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title">Como jogar</div><div class="topbar-spacer"></div></div>
+    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title" data-i18n="howto_title">Como jogar</div><div class="topbar-spacer"></div></div>
     <div class="sheet">
-      <p class="lead">Descubra a <b>palavra secreta de 5 letras</b>. A cada tentativa, as cores mostram o quão perto você está.</p>
+      <p class="lead" data-i18n-html="howto_lead">Descubra a <b>palavra secreta de 5 letras</b>. A cada tentativa, as cores mostram o quão perto você está.</p>
 
       <div class="example">
         <div class="ex-row">
@@ -59,59 +59,65 @@
       </div>
 
       <ul class="legend">
-        <li><span class="dot correct"></span> <b>Verde:</b> letra certa, no lugar certo.</li>
-        <li><span class="dot present"></span> <b>Amarelo:</b> a letra existe, mas em outro lugar.</li>
-        <li><span class="dot absent"></span> <b>Cinza:</b> a letra não está na palavra.</li>
+        <li><span class="dot correct"></span> <span data-i18n-html="lg_correct"><b>Verde:</b> letra certa, no lugar certo.</span></li>
+        <li><span class="dot present"></span> <span data-i18n-html="lg_present"><b>Amarelo:</b> a letra existe, mas em outro lugar.</span></li>
+        <li><span class="dot absent"></span> <span data-i18n-html="lg_absent"><b>Cinza:</b> a letra não está na palavra.</span></li>
       </ul>
 
-      <h3 class="sub">Dois jeitos de jogar</h3>
-      <p class="para"><b>Diário:</b> uma palavra por dia, igual para todo mundo. Vale para a sua sequência.</p>
-      <p class="para"><b>Livre:</b> jogue quantas vezes quiser, com palavras aleatórias. Ótimo pra treinar.</p>
+      <h3 class="sub" data-i18n="howto_modes_h">Dois jeitos de jogar</h3>
+      <p class="para" data-i18n-html="howto_daily"><b>Diário:</b> uma palavra por dia, igual para todo mundo. Vale para a sua sequência.</p>
+      <p class="para" data-i18n-html="howto_free"><b>Livre:</b> jogue quantas vezes quiser, com palavras aleatórias. Ótimo pra treinar.</p>
 
-      <h3 class="sub">Níveis</h3>
-      <p class="para">De <b>Fácil</b> (com dicas e folga) até <b>Lendário</b> (sem cores no teclado, menos tentativas e tempo por palpite). Escolha em <b>Configurações</b>.</p>
+      <h3 class="sub" data-i18n="howto_levels_h">Níveis</h3>
+      <p class="para" data-i18n-html="howto_levels">De <b>Fácil</b> (com dicas e folga) até <b>Lendário</b> (sem cores no teclado, menos tentativas e tempo por palpite). Escolha em <b>Configurações</b>.</p>
 
-      <h3 class="sub">Dicas</h3>
-      <p class="para">Se ativar nas configurações, um botão de <b>dica</b> aparece nos níveis mais fáceis para revelar uma letra quando você travar.</p>
+      <h3 class="sub" data-i18n="howto_hints_h">Dicas</h3>
+      <p class="para" data-i18n-html="howto_hints">Se ativar nas configurações, um botão de <b>dica</b> aparece nos níveis mais fáceis para revelar uma letra quando você travar.</p>
 
-      <button class="btn btn-primary" data-back>Entendi!</button>
+      <button class="btn btn-primary" data-back data-i18n="howto_ok">Entendi!</button>
     </div>
   </section>
 
   <!-- ===================== CONFIGURAÇÕES ===================== -->
   <section id="settings" class="screen">
-    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title">Configurações</div><div class="topbar-spacer"></div></div>
+    <div class="topbar"><button class="back-btn" data-back aria-label="Voltar">←</button><div class="topbar-title" data-i18n="settings_title">Configurações</div><div class="topbar-spacer"></div></div>
     <div class="sheet">
-      <label class="field-label" for="nameInput">Seu nome (opcional)</label>
-      <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="Como quer ser chamado?" autocomplete="off">
+      <label class="field-label" for="nameInput" data-i18n="name_label">Seu nome (opcional)</label>
+      <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="Como quer ser chamado?" data-i18n-ph="name_ph" autocomplete="off">
 
-      <div class="field-label" style="margin-top:20px">Nível de dificuldade</div>
+      <div class="field-label" style="margin-top:20px" data-i18n="lang_label">Idioma</div>
+      <div class="seg seg-wide" id="langSeg">
+        <button class="seg-btn" data-lang="pt">Português</button>
+        <button class="seg-btn" data-lang="en">English</button>
+      </div>
+
+      <div class="field-label" style="margin-top:20px" data-i18n="diff_label">Nível de dificuldade</div>
       <div id="levelCards" class="level-cards"></div>
 
       <div class="toggle-row">
         <div>
-          <div class="toggle-title">Ativar dicas</div>
-          <div class="toggle-desc">Mostra um botão de dica nos níveis que permitem (Fácil e Normal).</div>
+          <div class="toggle-title" data-i18n="hints_title">Ativar dicas</div>
+          <div class="toggle-desc" data-i18n="hints_desc">Mostra um botão de dica nos níveis que permitem (Fácil e Normal).</div>
         </div>
         <button id="hintsToggle" class="switch" role="switch" aria-checked="false"><span class="knob"></span></button>
       </div>
 
-      <div class="field-label" style="margin-top:20px">Tema</div>
+      <div class="field-label" style="margin-top:20px" data-i18n="theme_label">Tema</div>
       <div id="themeGrid" class="theme-grid"></div>
       <div id="customTheme" class="custom-theme" hidden>
-        <div class="ct-row"><span>Base</span>
+        <div class="ct-row"><span data-i18n="ct_base">Base</span>
           <div class="seg" id="baseSeg">
-            <button class="seg-btn" data-base="dark">Escuro</button>
-            <button class="seg-btn" data-base="light">Claro</button>
+            <button class="seg-btn" data-base="dark" data-i18n="ct_dark">Escuro</button>
+            <button class="seg-btn" data-base="light" data-i18n="ct_light">Claro</button>
           </div>
         </div>
-        <div class="ct-row"><span>Cor de destaque</span>
+        <div class="ct-row"><span data-i18n="ct_accent">Cor de destaque</span>
           <input id="customColor" type="color" value="#a78bfa" aria-label="Cor de destaque">
         </div>
         <div id="accentChips" class="accent-chips"></div>
       </div>
 
-      <button class="btn btn-primary" data-back>Salvar e voltar</button>
+      <button class="btn btn-primary" data-back data-i18n="save_back">Salvar e voltar</button>
     </div>
   </section>
 
@@ -124,7 +130,7 @@
     </div>
     <div class="board-wrap"><div id="board" class="board"></div></div>
     <div id="hintBar" class="hint-bar" hidden>
-      <button id="hintBtn" class="btn btn-hint">💡 Dica</button>
+      <button id="hintBtn" class="btn btn-hint" data-i18n="hint_btn">💡 Dica</button>
       <span id="hintText" class="hint-text"></span>
     </div>
     <div id="keyboard" class="keyboard"></div>
@@ -139,17 +145,17 @@
     <div id="rSub" class="sub"></div>
     <div id="rWord" class="word-reveal"></div>
     <div class="result-stats">
-      <div class="stat"><div id="rTries" class="n">-</div><div class="l">Tentativas</div></div>
-      <div class="stat"><div id="rPts" class="n">0</div><div class="l">Pontos</div></div>
-      <div class="stat"><div id="rStreak" class="n">0</div><div class="l">Sequência</div></div>
+      <div class="stat"><div id="rTries" class="n">-</div><div class="l" data-i18n="lbl_tries">Tentativas</div></div>
+      <div class="stat"><div id="rPts" class="n">0</div><div class="l" data-i18n="lbl_points">Pontos</div></div>
+      <div class="stat"><div id="rStreak" class="n">0</div><div class="l" data-i18n="lbl_streak">Sequência</div></div>
     </div>
     <div id="rCountdown" class="countdown" hidden>
-      <div class="cd-label">Próxima palavra em</div>
+      <div class="cd-label" data-i18n="cd_label">Próxima palavra em</div>
       <div id="cdClock" class="cd-clock">00:00:00</div>
     </div>
     <div class="result-actions">
       <button id="againBtn" class="btn btn-primary">Jogar de novo</button>
-      <button id="rHomeBtn" class="btn btn-ghost">Início</button>
+      <button id="rHomeBtn" class="btn btn-ghost" data-i18n="home">Início</button>
     </div>
   </div>
 </div>

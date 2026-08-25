@@ -75,7 +75,9 @@ penta-app/            (no VPS fica clonada como ~/projetos/penta)
 ├── DOCUMENTACAO.md      # Este arquivo
 ├── .gitignore           # O que NÃO vai pro Git (node_modules, logs, .env)
 ├── lib/
-│   └── game.js          # "Cérebro": palavras, regras, cifra, palavra do dia, dicas
+│   ├── game.js          # "Cérebro": regras, cifra, palavra do dia, dicas
+│   ├── palavras.js      # Palavras em português (respostas + palpites válidos)
+│   └── palavras-en.js   # Palavras em inglês (respostas + palpites válidos)
 └── public/              # Tudo que vai pro navegador (o nginx pode servir direto)
     ├── index.html       # Estrutura das telas
     ├── style.css        # Aparência + sistema de temas (variáveis CSS)
@@ -138,10 +140,12 @@ Servidor HTTP puro (sem Express). Responsabilidades:
 
 O "cérebro". Partes:
 
-#### Lista de palavras e normalização
-- `RAW`: um texto com ~250 palavras separadas por espaço.
+#### Palavras e validação (bilíngue)
+O jogo é **bilíngue** (português e inglês). Cada idioma tem seu arquivo em `lib/`:
+- **Português** — `palavras.js`, gerado do corpus **fserb/pt-br** (do criador do Termo): ~1.290 respostas comuns (filtradas por frequência ICF) e ~8.400 palpites válidos. Palavrões (lista "negativas" do criador) e nomes próprios (países/estados/municípios) removidos.
+- **Inglês** — `palavras-en.js`: ~2.310 respostas (as respostas oficiais do Wordle — fonte `ljskernel/wordle-solver`) e ~14.800 palpites válidos (fonte `tabatkins/wordle-list`). Ofensas de 5 letras removidas.
+- Em `game.js`, `LEXICO` junta os dois idiomas; `isWord(g, lang)` diz se um palpite é palavra real **naquele idioma**, e `dailyWord`/`randomWord` recebem o idioma.
 - `strip(s)`: remove acentos e troca `Ç`→`C`, deixando maiúsculas. Ex.: `"AÇÃO"`→`"ACAO"`.
-- `WORDS`: a lista final, só com palavras de **exatamente 5 letras A–Z**, sem repetidas.
 - `VOGAIS`: conjunto `A E I O U` (usado nas dicas).
 
 #### `DIFFS` — configuração dos níveis
@@ -355,8 +359,12 @@ Só o modo diário mexe na sequência: vitória soma 1; derrota zera. O recorde 
 > só **atualizando a página**. Alterações no servidor (`server.js`, `lib/game.js`) exigem **reiniciar**
 > o Node (local: Ctrl+C e rodar de novo; no VPS: `pm2 restart penta`).
 
-**Adicionar ou trocar palavras** — em `lib/game.js`, edite o texto `RAW`. Pode escrever com acento
-(`AÇÃO`); o código normaliza sozinho. Só entram palavras de **5 letras**. Palavras repetidas são ignoradas.
+**Adicionar ou trocar palavras** — as listas estão em `lib/palavras.js` (`RESPOSTAS` e `VALIDAS`).
+Para incluir/remover uma **resposta**, edite a string `_RESP`; para aceitar/recusar um **palpite**, edite `_VAL`.
+Use 5 letras, MAIÚSCULAS e **sem acento** (ex.: `ACAO`, não `AÇÃO`). As listas foram geradas do corpus
+fserb/pt-br; dá pra regenerar com mais/menos palavras ajustando o corte de frequência (ICF).
+O inglês fica em `lib/palavras-en.js` (mesmo formato: `_RESP` e `_VAL`). O jogador escolhe o idioma em
+**Configurações → Idioma**; cada idioma tem sua própria palavra do dia (a interface também é traduzida).
 
 **Mudar a dificuldade** — em `lib/game.js`, edite o objeto `DIFFS` (tentativas, tempo, multiplicador etc.).
 
@@ -791,7 +799,8 @@ Ponto a evoluir:
 
 **Hoje (Fase 1):**
 - É um jogo **single-player** completo. Nome, sequência e pontos ficam **no navegador** (não há login).
-- Dicionário com ~250 palavras comuns.
+- Dicionário do corpus fserb/pt-br: ~1.290 respostas comuns e ~8.400 palpites válidos aceitos (palpite fora da lista é recusado).
+- **Bilíngue (PT/EN):** o jogador escolhe o idioma em Configurações; cada idioma tem lista e palavra do dia próprias, e a interface toda é traduzida.
 - Níveis diferem pelas **regras** (não por raridade de palavra).
 
 **Fase 2 (planejada) — login + ranking:**
