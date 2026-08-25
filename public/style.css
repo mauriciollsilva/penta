@@ -208,3 +208,13 @@ body{font-family:var(--body);color:var(--text);background:var(--bg-3);overflow:h
 /* ---- seletor de idioma (largura total) ---- */
 .seg-wide{width:100%;margin-top:8px}
 .seg-wide .seg-btn{flex:1}
+
+/* ---- cursor na casa ativa (permite editar/sobrescrever no meio da palavra) ---- */
+.tile.caret .front{ box-shadow: inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow); animation: caretPulse 1.1s ease-in-out infinite; }
+@keyframes caretPulse{ 50%{ box-shadow: inset 0 0 0 2px var(--accent), 0 0 3px var(--accent-glow); } }
+
+/* ---- palavra inválida/proibida: treme + pisca vermelho (diferente do Termo) ---- */
+.row.buzz{ animation: buzz .55s cubic-bezier(.36,.07,.19,.97); }
+@keyframes buzz{ 15%{transform:translateX(-8px) rotate(-2deg)} 30%{transform:translateX(7px) rotate(2deg)} 45%{transform:translateX(-6px) rotate(-1deg)} 60%{transform:translateX(5px)} 75%{transform:translateX(-3px)} 100%{transform:none} }
+.row.buzz .front{ animation: reject .55s ease; }
+@keyframes reject{ 0%,100%{ box-shadow:none } 35%,65%{ box-shadow: inset 0 0 0 2px #f43f5e, 0 0 16px rgba(244,63,94,.7) } }

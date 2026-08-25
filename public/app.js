@@ -315,6 +315,7 @@ async function startGame(mode) {
   buildBoard(S.cfg.tentativas);
   buildKeyboard();
   resetKeyboardColors();
+  renderCaret();
 
   const showHints = S.cfg.dicasMax > 0 && S.hints;
   $('hintBar').hidden = !showHints;
@@ -362,13 +363,34 @@ document.addEventListener('keydown', e => {
   if (!$('game').classList.contains('active') || $('overlay').classList.contains('show')) return;
   if (e.key === 'Enter') handleKey('ENTER');
   else if (e.key === 'Backspace') handleKey('DEL');
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); handleKey('LEFT'); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); handleKey('RIGHT'); }
   else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+});
+// clicar numa casa da linha atual move o cursor pra lá (pra sobrescrever a letra)
+$('board').addEventListener('click', e => {
+  if (S.locked || S.over) return;
+  const tile = e.target.closest('.tile'); if (!tile) return;
+  const m = /^t-(\d+)-(\d+)$/.exec(tile.id); if (!m || Number(m[1]) !== S.row) return;
+  S.col = Number(m[2]); renderCaret();
 });
 function handleKey(k) {
   if (S.locked || S.over) return;
   if (k === 'ENTER') return submitRow();
-  if (k === 'DEL') { if (S.col > 0) { S.col--; S.grid[S.row][S.col] = ''; paint(S.row, S.col, ''); } return; }
-  if (S.col < 5) { S.grid[S.row][S.col] = k; paint(S.row, S.col, k); S.col++; }
+  if (k === 'LEFT') { S.col = Math.max(0, S.col - 1); return renderCaret(); }
+  if (k === 'RIGHT') { S.col = Math.min(5, S.col + 1); return renderCaret(); }
+  if (k === 'DEL') {
+    if (S.col < 5 && S.grid[S.row][S.col]) { S.grid[S.row][S.col] = ''; paint(S.row, S.col, ''); }
+    else if (S.col > 0) { S.col--; S.grid[S.row][S.col] = ''; paint(S.row, S.col, ''); }
+    return renderCaret();
+  }
+  if (S.col < 5) { S.grid[S.row][S.col] = k; paint(S.row, S.col, k); S.col = Math.min(S.col + 1, 5); renderCaret(); }
+}
+// cursor: destaca a casa que será digitada/sobrescrita na linha atual
+function renderCaret() {
+  document.querySelectorAll('.tile.caret').forEach(t => t.classList.remove('caret'));
+  if (S.over || S.locked || S.col >= 5) return;
+  const t = $(`t-${S.row}-${S.col}`); if (t) t.classList.add('caret');
 }
 function paint(r, c, ch) { const t = $(`t-${r}-${c}`); t.querySelector('.front').textContent = ch; t.classList.toggle('filled', !!ch); }
 
@@ -379,14 +401,14 @@ function hardModeError(g) {
 }
 
 async function submitRow() {
-  if (S.col < 5) { shake(); toast(L().missing); return; }
+  if (S.grid[S.row].some(c => !c)) { shake(); toast(L().missing); return; }
   const guess = S.grid[S.row].join('');
   if (S.cfg.hard) { const err = hardModeError(guess); if (err) { shake(); toast(err); return; } }
 
-  S.locked = true; stopRowTimer();
+  S.locked = true; stopRowTimer(); renderCaret();
   let data;
   try { data = await api('/api/guess', { token: S.token, guess }); }
-  catch (e) { S.locked = false; shake(); toastErr(e); if (S.cfg.tempo > 0) startRowTimer(); return; }
+  catch (e) { S.locked = false; if (e.code === 'notword') buzz(); else shake(); toastErr(e); renderCaret(); if (S.cfg.tempo > 0) startRowTimer(); return; }
 
   const result = data.result;
   result.forEach((st, i) => {
@@ -406,7 +428,7 @@ async function submitRow() {
       S.answer = data.answer || '';
       endGame(data.won, { attempt: data.attempt });
     } else {
-      S.token = data.token; S.row++; S.col = 0; S.locked = false;
+      S.token = data.token; S.row++; S.col = 0; S.locked = false; renderCaret();
       if (S.cfg.tempo > 0) startRowTimer();
     }
   }, (5 - 1) * 300 + 600);
@@ -420,6 +442,7 @@ function updateKey(letter, st) {
   k.classList.remove('correct', 'present', 'absent'); k.classList.add(st);
 }
 function shake() { const r = $('row-' + S.row); r.classList.add('shake'); setTimeout(() => r.classList.remove('shake'), 450); }
+function buzz() { const r = $('row-' + S.row); r.classList.remove('buzz'); void r.offsetWidth; r.classList.add('buzz'); setTimeout(() => r.classList.remove('buzz'), 600); }
 
 /* ---------- dica ---------- */
 $('hintBtn').addEventListener('click', async () => {

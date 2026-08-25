@@ -142,7 +142,7 @@ O "cérebro". Partes:
 
 #### Palavras e validação (bilíngue)
 O jogo é **bilíngue** (português e inglês). Cada idioma tem seu arquivo em `lib/`:
-- **Português** — `palavras.js`, gerado do corpus **fserb/pt-br** (do criador do Termo): ~1.290 respostas comuns (filtradas por frequência ICF) e ~8.400 palpites válidos. Palavrões (lista "negativas" do criador) e nomes próprios (países/estados/municípios) removidos.
+- **Português** — `palavras.js`: ~1.290 respostas comuns do corpus **fserb/pt-br** (do criador do Termo, filtradas por frequência ICF) e ~13.400 palpites válidos. A lista de válidas é a **união** de fserb + `pythonprobr/palavras` + uma lista curada de **femininos comuns** (o léxico do fserb é "enxuto" e não tem flexões como "ótima"). Palavrões (lista "negativas") e nomes próprios (países/estados/municípios) removidos.
 - **Inglês** — `palavras-en.js`: ~2.310 respostas (as respostas oficiais do Wordle — fonte `ljskernel/wordle-solver`) e ~14.800 palpites válidos (fonte `tabatkins/wordle-list`). Ofensas de 5 letras removidas.
 - Em `game.js`, `LEXICO` junta os dois idiomas; `isWord(g, lang)` diz se um palpite é palavra real **naquele idioma**, e `dailyWord`/`randomWord` recebem o idioma.
 - `strip(s)`: remove acentos e troca `Ç`→`C`, deixando maiúsculas. Ex.: `"AÇÃO"`→`"ACAO"`.
@@ -799,7 +799,7 @@ Ponto a evoluir:
 
 **Hoje (Fase 1):**
 - É um jogo **single-player** completo. Nome, sequência e pontos ficam **no navegador** (não há login).
-- Dicionário do corpus fserb/pt-br: ~1.290 respostas comuns e ~8.400 palpites válidos aceitos (palpite fora da lista é recusado).
+- Dicionário PT: ~1.290 respostas (fserb/pt-br por ICF) e ~13.400 palpites válidos (união fserb + pythonprobr + femininos curados); palpite fora da lista é recusado.
 - **Bilíngue (PT/EN):** o jogador escolhe o idioma em Configurações; cada idioma tem lista e palavra do dia próprias, e a interface toda é traduzida.
 - Níveis diferem pelas **regras** (não por raridade de palavra).
 
