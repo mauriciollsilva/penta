@@ -1,0 +1,17 @@
+services:
+  penta:
+    build: .
+    container_name: penta
+    environment:
+      PORT: 3010
+    # Escuta só no localhost da VM (exposição pública fica pro fim, via túnel).
+    ports:
+      - "127.0.0.1:3010:3010"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
